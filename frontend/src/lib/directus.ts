@@ -24,6 +24,7 @@ export interface CocktailSummary {
   glass_label: string;
   garnish?: string;
   tone_color: string;
+  image?: string;
   imageUrl?: string;
 }
 
@@ -59,7 +60,7 @@ export async function fetchAllCocktails(): Promise<Cocktail[]> {
   const fields = [
     'id', 'slug', 'name', 'description', 'base_spirit', 'category', 'country',
     'temperature', 'abv', 'preparation_time', 'difficulty', 'glass_type', 'glass_label',
-    'garnish', 'tone_color', 'instructions', 'tags', 'source',
+    'garnish', 'tone_color', 'instructions', 'tags', 'source', 'image',
     'ingredients.id', 'ingredients.name', 'ingredients.amount', 'ingredients.sort', 'ingredients.optional', 'ingredients.note',
     'steps.id', 'steps.step_number', 'steps.instruction',
   ].join(',');
@@ -119,6 +120,7 @@ function normalizeCocktail(item: any): Cocktail {
     instructions: item.instructions ?? '',
     tags: item.tags ?? [],
     source: item.source,
+    image: item.image ?? undefined,
     imageUrl: undefined,
     ingredients,
     steps,

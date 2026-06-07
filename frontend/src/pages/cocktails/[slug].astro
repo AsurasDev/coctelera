@@ -32,7 +32,7 @@ interface Props {
 
 const { cocktail: c, prevSlug, prevName, nextSlug, nextName, total, position } = Astro.props;
 const DIRECTUS_URL = import.meta.env.DIRECTUS_URL ?? '';
-const imageId = (c as any).image;
+const imageId = c.image;
 const imgSrc  = imageId ? `${DIRECTUS_URL}/assets/${imageId}?width=900&height=1125&fit=cover&format=webp&quality=85` : null;
 
 const TONE_COLORS: Record<string, string> = {

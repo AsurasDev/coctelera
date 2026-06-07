@@ -225,6 +225,7 @@ async function importCocktail(slug: string): Promise<boolean> {
       tags,
       source: data.source ?? '',
       status: 'published',
+      ...(imageFileId ? { image: imageFileId } : {}),
     });
 
     const cocktailId = cocktailRes.data?.id;
@@ -253,20 +254,7 @@ async function importCocktail(slug: string): Promise<boolean> {
       });
     }
 
-    // Attach image file
-    if (imageFileId) {
-      await directusRequest('POST', '/files/import', {}).catch(() => null);
-      // Link via directus_files junction
-      try {
-        await directusRequest('POST', '/items/cocktails_files', {
-          cocktails_id: cocktailId,
-          directus_files_id: imageFileId,
-          sort: 1,
-        });
-      } catch {
-        // Junction table may not exist; file still uploaded
-      }
-    }
+    // Image is already linked via the `image` field on create
 
     return true;
   } catch (e: any) {

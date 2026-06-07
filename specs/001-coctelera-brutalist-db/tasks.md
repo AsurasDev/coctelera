@@ -27,7 +27,7 @@
 - [x] T007 [P] Create `backend/docker-compose.yml` with Directus 11.x + PostgreSQL for local development
 - [x] T008 Create `railway.toml` at repo root: build command `cd frontend && npm run build`, start command `npx serve frontend/dist -l 3000`
 - [x] T009 [P] Add `.gitignore` at repo root: node_modules, dist, .env files, .DS_Store
-- [ ] T010 Create GitHub repository `coctelera` (public) and push initial commit
+- [x] T010 Create GitHub repository `coctelera` (public) and push initial commit
 
 **Checkpoint**: `cd frontend && npm run build` produces a `dist/` folder. Local Directus starts via `docker compose up -d`.
 
@@ -41,20 +41,20 @@
 
 ### Directus Schema & Data
 
-- [ ] T011 Create `scripts/setup-directus.ts` that creates all Directus collections via Directus API: `cocktails`, `cocktail_ingredients`, `cocktail_steps`, `cocktail_images` with fields from `specs/001-coctelera-brutalist-db/data-model.md`
-- [ ] T012 Run `DIRECTUS_URL=http://localhost:8055 DIRECTUS_TOKEN=<token> npx tsx scripts/setup-directus.ts` and verify all collections appear in Directus admin
-- [ ] T013 Create `scripts/import-data.ts` that: (1) fetches cocktail list from GitHub API `repos/bar-assistant/data/contents/data/cocktails`, (2) for each cocktail downloads `data.json`, (3) normalizes fields per mapping in `specs/001-coctelera-brutalist-db/research.md` §3, (4) downloads images and uploads to Directus Files API, (5) creates cocktail record + ingredients + steps via Directus REST API
-- [ ] T014 Run import script against local Directus: `DIRECTUS_URL=http://localhost:8055 DIRECTUS_TOKEN=<token> npx tsx scripts/import-data.ts` — verify 200+ cocktails imported in admin panel
+- [x] T011 Create `scripts/setup-directus.ts` that creates all Directus collections via Directus API: `cocktails`, `cocktail_ingredients`, `cocktail_steps`, `cocktail_images` with fields from `specs/001-coctelera-brutalist-db/data-model.md`
+- [x] T012 Run `DIRECTUS_URL=http://localhost:8055 DIRECTUS_TOKEN=<token> npx tsx scripts/setup-directus.ts` and verify all collections appear in Directus admin
+- [x] T013 Create `scripts/import-data.ts` that: (1) fetches cocktail list from GitHub API `repos/bar-assistant/data/contents/data/cocktails`, (2) for each cocktail downloads `data.json`, (3) normalizes fields per mapping in `specs/001-coctelera-brutalist-db/research.md` §3, (4) downloads images and uploads to Directus Files API, (5) creates cocktail record + ingredients + steps via Directus REST API
+- [x] T014 Run import script against local Directus: `DIRECTUS_URL=http://localhost:8055 DIRECTUS_TOKEN=<token> npx tsx scripts/import-data.ts` — verify 200+ cocktails imported in admin panel
 
 ### Astro Design System
 
-- [ ] T015 [P] Create `frontend/src/styles/simuu-v2.css` with all CSS custom property tokens from design file: spacing (--sm-space-*), typography (--sm-font-*, --sm-text-*, --sm-weight-*), colors (--sm-ink, --sm-paper, --sm-color-*), borders (--sm-border-*), shadows (--sm-shadow-*), radius (--sm-radius-*), motion (--sm-duration-*, --sm-ease-*)
-- [ ] T016 [P] Create `frontend/src/styles/app.css` with component classes: `.c-shell`, `.c-topbar`, `.c-brand`, `.c-brand__mark`, `.c-brand__word`, `.c-brand__tag`, `.c-counter`, `.c-card`, `.c-card__panel`, `.c-card__abv`, `.c-card__cat`, `.c-card__body`, `.c-card__name`, `.c-card__base`, `.c-card__meta`, `.c-metachip`, `.c-foot` — brutalist style per design file
-- [ ] T017 Create `frontend/src/lib/palettes.ts` exporting `PALETTES` array with all 20 palette definitions (id, label, bg, bgAlt, surface, ink, inverse, muted, primary, primaryFg, warn, swatch) from `specs/001-coctelera-brutalist-db/research.md` §8
-- [ ] T018 Create `frontend/src/lib/directus.ts` with: Directus client setup, `fetchAllCocktails()` returning `CocktailSummary[]`, `fetchCocktail(slug)` returning `Cocktail`, image URL helpers — types from `specs/001-coctelera-brutalist-db/data-model.md`
-- [ ] T019 Create `frontend/src/components/Layout.astro` with: Google Fonts preload (Archivo Black, IBM Plex Sans, JetBrains Mono, IBM Plex Mono), simuu-v2.css + app.css imports, anti-FOUC inline `<script>` in `<head>` that reads `localStorage.getItem('coctelera.palette')` and applies palette CSS vars to `:root` before paint, footer slot, page title prop
-- [ ] T020 [P] Create `frontend/src/components/GlassIllustration.astro` with inline SVG functions for 7 glass types (rocks, highball, coupe, martini, hurricane, wine, shot) — brutalist style: thick black stroke (stroke-width 6-8), flat liquid color fill, garnish decorations (orange slice, lime wedge, cherry, mint sprig, lemon) per the design file's glass illustrations
-- [ ] T021 Add tone-color CSS data attributes to `app.css`: `[data-tone="blue"]`, `[data-tone="teal"]`, `[data-tone="green"]`, `[data-tone="violet"]`, `[data-tone="orange"]`, `[data-tone="red"]`, `[data-tone="emerald"]`, `[data-tone="amber"]` each setting `--c-tone`
+- [x] T015 [P] Create `frontend/src/styles/simuu-v2.css` with all CSS custom property tokens from design file: spacing (--sm-space-*), typography (--sm-font-*, --sm-text-*, --sm-weight-*), colors (--sm-ink, --sm-paper, --sm-color-*), borders (--sm-border-*), shadows (--sm-shadow-*), radius (--sm-radius-*), motion (--sm-duration-*, --sm-ease-*)
+- [x] T016 [P] Create `frontend/src/styles/app.css` with component classes: `.c-shell`, `.c-topbar`, `.c-brand`, `.c-brand__mark`, `.c-brand__word`, `.c-brand__tag`, `.c-counter`, `.c-card`, `.c-card__panel`, `.c-card__abv`, `.c-card__cat`, `.c-card__body`, `.c-card__name`, `.c-card__base`, `.c-card__meta`, `.c-metachip`, `.c-foot` — brutalist style per design file
+- [x] T017 Create `frontend/src/lib/palettes.ts` exporting `PALETTES` array with all 20 palette definitions (id, label, bg, bgAlt, surface, ink, inverse, muted, primary, primaryFg, warn, swatch) from `specs/001-coctelera-brutalist-db/research.md` §8
+- [x] T018 Create `frontend/src/lib/directus.ts` with: Directus client setup, `fetchAllCocktails()` returning `CocktailSummary[]`, `fetchCocktail(slug)` returning `Cocktail`, image URL helpers — types from `specs/001-coctelera-brutalist-db/data-model.md`
+- [x] T019 Create `frontend/src/components/Layout.astro` with: Google Fonts preload (Archivo Black, IBM Plex Sans, JetBrains Mono, IBM Plex Mono), simuu-v2.css + app.css imports, anti-FOUC inline `<script>` in `<head>` that reads `localStorage.getItem('coctelera.palette')` and applies palette CSS vars to `:root` before paint, footer slot, page title prop
+- [x] T020 [P] Create `frontend/src/components/GlassIllustration.astro` with inline SVG functions for 7 glass types (rocks, highball, coupe, martini, hurricane, wine, shot) — brutalist style: thick black stroke (stroke-width 6-8), flat liquid color fill, garnish decorations (orange slice, lime wedge, cherry, mint sprig, lemon) per the design file's glass illustrations
+- [x] T021 Add tone-color CSS data attributes to `app.css`: `[data-tone="blue"]`, `[data-tone="teal"]`, `[data-tone="green"]`, `[data-tone="violet"]`, `[data-tone="orange"]`, `[data-tone="red"]`, `[data-tone="emerald"]`, `[data-tone="amber"]` each setting `--c-tone`
 
 **Checkpoint**: `cd frontend && npm run build` compiles without errors. Directus local has 200+ cocktails. Design CSS applies correct brutalist tokens.
 
@@ -70,18 +70,18 @@
 
 ### Gallery Page (US1)
 
-- [ ] T022 [US1] Create `frontend/src/pages/index.astro`: fetch all cocktails via `fetchAllCocktails()` at build time, embed `CocktailSummary[]` as `<script type="application/json" id="cocktail-data">` in page, render `<Layout>` with topbar (brand + counter badge), lead hero section ("El bar BRUTALISTA" h1 with em highlight, descriptor paragraph), placeholder `<div id="gallery-root">` for Alpine.js gallery
-- [ ] T023 [US1] Create `frontend/src/components/CocktailCard.astro` with props `{ cocktail: CocktailSummary, showAbv?: boolean }`: renders `.c-card` with `data-tone` attribute, `.c-card__panel` containing `<GlassIllustration>`, category badge (`.c-card__cat`), ABV badge (`.c-card__abv`), `.c-card__body` with name, base spirit indicator, metachips (glass, temperature with icon, country, difficulty) — card links to `/cocktails/${cocktail.slug}`
-- [ ] T024 [US1] Add gallery grid to `index.astro`: server-side render initial card grid using `CocktailCard.astro` so gallery works without JS (progressive enhancement baseline)
-- [ ] T025 [US1] Add Alpine.js `x-data` island in `index.astro` for client-side filtering: reads data from `#cocktail-data` script tag, exposes `query`, `filtered`, `sortBy`, re-renders card list via `x-for` template — grid hides SSR version when Alpine initializes
+- [x] T022 [US1] Create `frontend/src/pages/index.astro`: fetch all cocktails via `fetchAllCocktails()` at build time, embed `CocktailSummary[]` as `<script type="application/json" id="cocktail-data">` in page, render `<Layout>` with topbar (brand + counter badge), lead hero section ("El bar BRUTALISTA" h1 with em highlight, descriptor paragraph), placeholder `<div id="gallery-root">` for Alpine.js gallery
+- [x] T023 [US1] Create `frontend/src/components/CocktailCard.astro` with props `{ cocktail: CocktailSummary, showAbv?: boolean }`: renders `.c-card` with `data-tone` attribute, `.c-card__panel` containing `<GlassIllustration>`, category badge (`.c-card__cat`), ABV badge (`.c-card__abv`), `.c-card__body` with name, base spirit indicator, metachips (glass, temperature with icon, country, difficulty) — card links to `/cocktails/${cocktail.slug}`
+- [x] T024 [US1] Add gallery grid to `index.astro`: server-side render initial card grid using `CocktailCard.astro` so gallery works without JS (progressive enhancement baseline)
+- [x] T025 [US1] Add Alpine.js `x-data` island in `index.astro` for client-side filtering: reads data from `#cocktail-data` script tag, exposes `query`, `filtered`, `sortBy`, re-renders card list via `x-for` template — grid hides SSR version when Alpine initializes
 
 ### Detail Pages (US3)
 
-- [ ] T026 [US3] Create `frontend/src/pages/cocktails/[slug].astro`: implement `getStaticPaths()` that calls `fetchAllCocktails()`, returns one path per slug with `cocktail: Cocktail` and `prevCocktail/nextCocktail` props (adjacent by sorted name order)
-- [ ] T027 [US3] Create `frontend/src/components/MetaStrip.astro` with props `{ abv, preparationTime, difficulty, temperature, country, glassLabel }`: renders 3×2 CSS grid with dark background (`.c-metastrip`), each cell has label+icon (`.c-metastrip__label`) and value (`.c-metastrip__value`) — uses inline SVG icons for droplet, clock, flame, cube/snow/droplet (temperature), globe, glass
-- [ ] T028 [US3] Implement detail page layout in `[slug].astro`: `.c-detail__grid` (two-column: visual left, info right), visual panel with `<GlassIllustration>` + tag eyebrow, info column with eyebrow (base·categoría·país), h1 title, description paragraph, `<MetaStrip>`, ingredients block (`.c-block` with `.c-ing` rows: amount in `.c-ing__amt` mono + name), steps block (`.c-steps` ol with `.c-step` items: numbered square + instruction text)
-- [ ] T029 [US3] Add prev/next navigation footer to detail page (`.c-detailnav`): two buttons with direction label + cocktail name; first/last cocktails have disabled prev/next respectively. Add back-to-gallery button (`.c-back`)
-- [ ] T030 [US3] Add keyboard navigation script to detail pages: Escape → back to gallery, ArrowLeft → prev cocktail, ArrowRight → next cocktail
+- [x] T026 [US3] Create `frontend/src/pages/cocktails/[slug].astro`: implement `getStaticPaths()` that calls `fetchAllCocktails()`, returns one path per slug with `cocktail: Cocktail` and `prevCocktail/nextCocktail` props (adjacent by sorted name order)
+- [x] T027 [US3] Create `frontend/src/components/MetaStrip.astro` with props `{ abv, preparationTime, difficulty, temperature, country, glassLabel }`: renders 3×2 CSS grid with dark background (`.c-metastrip`), each cell has label+icon (`.c-metastrip__label`) and value (`.c-metastrip__value`) — uses inline SVG icons for droplet, clock, flame, cube/snow/droplet (temperature), globe, glass
+- [x] T028 [US3] Implement detail page layout in `[slug].astro`: `.c-detail__grid` (two-column: visual left, info right), visual panel with `<GlassIllustration>` + tag eyebrow, info column with eyebrow (base·categoría·país), h1 title, description paragraph, `<MetaStrip>`, ingredients block (`.c-block` with `.c-ing` rows: amount in `.c-ing__amt` mono + name), steps block (`.c-steps` ol with `.c-step` items: numbered square + instruction text)
+- [x] T029 [US3] Add prev/next navigation footer to detail page (`.c-detailnav`): two buttons with direction label + cocktail name; first/last cocktails have disabled prev/next respectively. Add back-to-gallery button (`.c-back`)
+- [x] T030 [US3] Add keyboard navigation script to detail pages: Escape → back to gallery, ArrowLeft → prev cocktail, ArrowRight → next cocktail
 
 **Checkpoint (US1)**: `npm run build` generates `dist/index.html` with all cocktail cards. Page loads without JS showing all cards. Counter badge shows correct total.
 
@@ -97,15 +97,15 @@
 
 ### Search & Filter Implementation
 
-- [ ] T031 [US2] Add filter CSS classes to `app.css`: `.c-toolbar`, `.c-toolbar__row`, `.c-search`, `.c-search__clear`, `.c-filtergroup`, `.c-filtergroup__label`, `.c-chips`, `.c-chip`, `.c-chip.is-active`, `.c-chip__dot`, `.c-chip__ico`, `.c-seg`, `.c-resultline`, `.c-resultline__reset`, `.c-filtersbtn`, `.c-filtersbtn__badge`, `.c-filterpanel`, `.c-activetags`, `.c-tag`, `.c-fdrop`, `.c-fdrop__btn`, `.c-fdrop__menu`, `.c-fdrop__opt`, `.c-empty` — per design file specs
-- [ ] T032 [US2] Extend Alpine.js `x-data` in `index.astro` with filter state: `activeBase`, `activeCategory`, `activeCountry`, `activeTemp`, `filterMode` ('plegable'|'menus'|'completo'), `panelOpen`, computed `filtered` (applies all filters + search + sort in sequence), `clearAll()`, `activeCount` computed, `hasFilters` computed
-- [ ] T033 [US2] Implement filter persistence in Alpine.js: on mount read `localStorage.getItem('coctelera.filters')` and restore state; on any filter change save `JSON.stringify({ base, category, country, temp, sort, filterMode })` to localStorage
-- [ ] T034 [US2] Build toolbar HTML in `index.astro` with Alpine `x-show`/`x-bind` bindings: search input (`x-model="query"`), filter button with badge (`x-text="activeCount"`), sort segmented control, active filter tags (removable, `x-for` over active filters)
-- [ ] T035 [US2] Implement "Plegable" filter mode in toolbar: collapsible panel triggered by filter button, chip rows for each dimension (Licor base, Categoría, Temperatura with icons, Origen) inside `.c-filterpanel` with `x-show="panelOpen"`
+- [x] T031 [US2] Add filter CSS classes to `app.css`: `.c-toolbar`, `.c-toolbar__row`, `.c-search`, `.c-search__clear`, `.c-filtergroup`, `.c-filtergroup__label`, `.c-chips`, `.c-chip`, `.c-chip.is-active`, `.c-chip__dot`, `.c-chip__ico`, `.c-seg`, `.c-resultline`, `.c-resultline__reset`, `.c-filtersbtn`, `.c-filtersbtn__badge`, `.c-filterpanel`, `.c-activetags`, `.c-tag`, `.c-fdrop`, `.c-fdrop__btn`, `.c-fdrop__menu`, `.c-fdrop__opt`, `.c-empty` — per design file specs
+- [x] T032 [US2] Extend Alpine.js `x-data` in `index.astro` with filter state: `activeBase`, `activeCategory`, `activeCountry`, `activeTemp`, `filterMode` ('plegable'|'menus'|'completo'), `panelOpen`, computed `filtered` (applies all filters + search + sort in sequence), `clearAll()`, `activeCount` computed, `hasFilters` computed
+- [x] T033 [US2] Implement filter persistence in Alpine.js: on mount read `localStorage.getItem('coctelera.filters')` and restore state; on any filter change save `JSON.stringify({ base, category, country, temp, sort, filterMode })` to localStorage
+- [x] T034 [US2] Build toolbar HTML in `index.astro` with Alpine `x-show`/`x-bind` bindings: search input (`x-model="query"`), filter button with badge (`x-text="activeCount"`), sort segmented control, active filter tags (removable, `x-for` over active filters)
+- [x] T035 [US2] Implement "Plegable" filter mode in toolbar: collapsible panel triggered by filter button, chip rows for each dimension (Licor base, Categoría, Temperatura with icons, Origen) inside `.c-filterpanel` with `x-show="panelOpen"`
 - [ ] T036 [US2] Implement "Menús" filter mode: one `.c-fdrop` dropdown per dimension inside `x-show="filterMode === 'menus'"` row; each dropdown uses `x-data` with `open` boolean and click-outside handler
 - [ ] T037 [US2] Implement "Completo" filter mode: all chip rows always visible inside `x-show="filterMode === 'completo'"` section
-- [ ] T038 [US2] Add normalized text search in Alpine `filtered` computed: normalize query + cocktail text with `text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')` before comparison for accent-insensitive search
-- [ ] T039 [US2] Add result count line and empty state: `.c-resultline` with count + "Limpiar filtros" button when `hasFilters`; `.c-empty` with martini icon when `filtered.length === 0`
+- [x] T038 [US2] Add normalized text search in Alpine `filtered` computed: normalize query + cocktail text with `text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')` before comparison for accent-insensitive search
+- [x] T039 [US2] Add result count line and empty state: `.c-resultline` with count + "Limpiar filtros" button when `hasFilters`; `.c-empty` with martini icon when `filtered.length === 0`
 
 **Checkpoint**: Gallery has working toolbar. Type "mojito" → 1 result. Filter "Con hielo" + "Ginebra" → only gin+ice cocktails. Mode switch between Plegable/Menús/Completo works. Reload → filters persist.
 
@@ -119,11 +119,11 @@
 
 ### Palette Selector Implementation
 
-- [ ] T040 [US4] Add palette CSS to `app.css`: `.c-palette-grid` (2-column grid), `.c-palette-btn` (flex column, border state for active), `.c-palette-swatch` (flex row of 3 color segments), `.c-palette-label` — palette selector positioned in topbar or as slide-out panel trigger
+- [x] T040 [US4] Add palette CSS to `app.css`: `.c-palette-grid` (2-column grid), `.c-palette-btn` (flex column, border state for active), `.c-palette-swatch` (flex row of 3 color segments), `.c-palette-label` — palette selector positioned in topbar or as slide-out panel trigger
 - [ ] T041 [US4] Create `frontend/src/components/PaletteSelector.astro`: renders palette grid button, imports `PALETTES` from `lib/palettes.ts`, emits `<script>` with Alpine `x-data` that: reads current palette from localStorage, calls `applyPalette(pal)` to set CSS vars on `:root` for all 9 semantic tokens (bg, bgAlt, surface, ink, inverse, muted, primary, primaryFg, warn), saves selection to `localStorage.setItem('coctelera.palette', id)` on click
-- [ ] T042 [US4] Add `applyPalette` function to `Layout.astro` inline `<head>` script: function sets all 9 `--sm-*` CSS custom properties on `document.documentElement.style` from a palette object; called both for anti-FOUC on load and by Alpine when user selects a palette
-- [ ] T043 [US4] Include `<PaletteSelector>` in `Layout.astro` topbar area, wired to same `applyPalette` function via `window.__applyPalette` global
-- [ ] T044 [US4] Add `window.__PALETTES__` global in `Layout.astro` `<head>` script (JSON of all 20 palettes) so anti-FOUC script can apply saved palette before CSS renders
+- [x] T042 [US4] Add `applyPalette` function to `Layout.astro` inline `<head>` script: function sets all 9 `--sm-*` CSS custom properties on `document.documentElement.style` from a palette object; called both for anti-FOUC on load and by Alpine when user selects a palette
+- [x] T043 [US4] Include `<PaletteSelector>` in `Layout.astro` topbar area, wired to same `applyPalette` function via `window.__applyPalette` global
+- [x] T044 [US4] Add `window.__PALETTES__` global in `Layout.astro` `<head>` script (JSON of all 20 palettes) so anti-FOUC script can apply saved palette before CSS renders
 
 **Checkpoint**: Palette selector visible in topbar. All 20 palettes selectable. Dark palettes (Carbón, Medianoche, Selva, Espresso, Índigo) show white text on dark background. Page reload applies saved palette with no flash.
 
@@ -133,10 +133,10 @@
 
 **Purpose**: Deploy Directus backend and Astro frontend to Railway, configure webhook for rebuild on content change.
 
-- [ ] T045 [P] Create Railway project "coctelera" via Railway dashboard or CLI: `railway new coctelera`
-- [ ] T046 Add Directus service to Railway: use template `directus/directus:latest` Docker image, add PostgreSQL plugin, set environment variables: `KEY`, `SECRET`, `DATABASE_URL` (auto from plugin), `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `PUBLIC_URL` (Railway-assigned domain), `CORS_ENABLED=true`, `CORS_ORIGIN=true`
+- [x] T045 [P] Create Railway project "coctelera" via Railway dashboard or CLI: `railway new coctelera`
+- [x] T046 Add Directus service to Railway: use template `directus/directus:latest` Docker image, add PostgreSQL plugin, set environment variables: `KEY`, `SECRET`, `DATABASE_URL` (auto from plugin), `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `PUBLIC_URL` (Railway-assigned domain), `CORS_ENABLED=true`, `CORS_ORIGIN=true`
 - [ ] T047 Run import script against production Directus: `DIRECTUS_URL=https://<directus-domain>.railway.app DIRECTUS_TOKEN=<token> npx tsx scripts/import-data.ts` — verify 200+ cocktails in production admin
-- [ ] T048 Add frontend service to Railway: connect to GitHub repo `coctelera`, set root directory `frontend/`, build command `npm run build`, start command `npx serve dist -l $PORT`, set env vars `DIRECTUS_URL` and `DIRECTUS_TOKEN`
+- [x] T048 Add frontend service to Railway: connect to GitHub repo `coctelera`, set root directory `frontend/`, build command `npm run build`, start command `npx serve dist -l $PORT`, set env vars `DIRECTUS_URL` and `DIRECTUS_TOKEN`
 - [ ] T049 Trigger first frontend build on Railway — verify site loads at Railway URL with all cocktails
 - [ ] T050 Configure Directus Flow (automation) in production Directus admin: trigger on `cocktails` collection create/update/delete → HTTP POST to Railway frontend Deploy Hook URL (found in Railway service settings → Deploy → Deploy Hook)
 - [ ] T051 Test rebuild webhook: create a test cocktail in production Directus → verify Railway triggers new frontend deployment → new cocktail appears in gallery after deploy
@@ -149,10 +149,10 @@
 
 **Purpose**: Responsive layout, accessibility, 404 page, SEO meta tags, and final validation.
 
-- [ ] T052 [P] Create `frontend/src/pages/404.astro` with brutalist empty state: large "404" display text, "Coctel no encontrado" subheading, back-to-gallery button
-- [ ] T053 [P] Add responsive CSS breakpoints to `app.css`: `.c-grid` 3→2→1 columns at 1080px→600px, `.c-detail__grid` single column at 900px, `.c-metastrip` 3→2 columns at 480px
-- [ ] T054 [P] Add SEO meta tags to `Layout.astro`: `<title>` (dynamic per page), `<meta name="description">`, Open Graph tags (`og:title`, `og:description`, `og:image` using first cocktail image for detail pages)
-- [ ] T055 Add `lang="es"` to `<html>` in `Layout.astro` and `aria-label` attributes to interactive elements (filter buttons, navigation buttons, search input)
+- [x] T052 [P] Create `frontend/src/pages/404.astro` with brutalist empty state: large "404" display text, "Coctel no encontrado" subheading, back-to-gallery button
+- [x] T053 [P] Add responsive CSS breakpoints to `app.css`: `.c-grid` 3→2→1 columns at 1080px→600px, `.c-detail__grid` single column at 900px, `.c-metastrip` 3→2 columns at 480px
+- [x] T054 [P] Add SEO meta tags to `Layout.astro`: `<title>` (dynamic per page), `<meta name="description">`, Open Graph tags (`og:title`, `og:description`, `og:image` using first cocktail image for detail pages)
+- [x] T055 Add `lang="es"` to `<html>` in `Layout.astro` and `aria-label` attributes to interactive elements (filter buttons, navigation buttons, search input)
 - [ ] T056 [P] Verify Core Web Vitals: run `npx lighthouse https://<frontend>.railway.app --output json` — LCP < 2.5s, CLS < 0.1
 - [ ] T057 Run full quickstart validation checklist from `specs/001-coctelera-brutalist-db/quickstart.md` §4 — all 7 validation scenarios must pass
 - [ ] T058 [P] Update `specs/001-coctelera-brutalist-db/` documentation with any deviations found during implementation

@@ -16,7 +16,7 @@ const summaries = cocktails.map(c => ({
   abv:         c.abv,
   difficulty:  c.difficulty,
   tone_color:  c.tone_color,
-  image_id:    (c as any).image ?? undefined,
+  image_id:    c.image ?? undefined,
 }));
 
 const DIRECTUS_URL = import.meta.env.DIRECTUS_URL ?? '';
@@ -299,7 +299,7 @@ const dataJson = JSON.stringify({ cocktails: summaries, directusUrl: DIRECTUS_UR
             abv={c.abv}
             difficulty={c.difficulty}
             tone_color={c.tone_color}
-            image_id={(c as any).image}
+            image_id={c.image}
           />
         ))}
       </main>
