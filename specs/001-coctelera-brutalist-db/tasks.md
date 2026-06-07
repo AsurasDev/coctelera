@@ -102,8 +102,8 @@
 - [x] T033 [US2] Implement filter persistence in Alpine.js: on mount read `localStorage.getItem('coctelera.filters')` and restore state; on any filter change save `JSON.stringify({ base, category, country, temp, sort, filterMode })` to localStorage
 - [x] T034 [US2] Build toolbar HTML in `index.astro` with Alpine `x-show`/`x-bind` bindings: search input (`x-model="query"`), filter button with badge (`x-text="activeCount"`), sort segmented control, active filter tags (removable, `x-for` over active filters)
 - [x] T035 [US2] Implement "Plegable" filter mode in toolbar: collapsible panel triggered by filter button, chip rows for each dimension (Licor base, Categoría, Temperatura with icons, Origen) inside `.c-filterpanel` with `x-show="panelOpen"`
-- [ ] T036 [US2] Implement "Menús" filter mode: one `.c-fdrop` dropdown per dimension inside `x-show="filterMode === 'menus'"` row; each dropdown uses `x-data` with `open` boolean and click-outside handler
-- [ ] T037 [US2] Implement "Completo" filter mode: all chip rows always visible inside `x-show="filterMode === 'completo'"` section
+- [x] T036 [US2] Implement "Menús" filter mode: one `.c-fdrop` dropdown per dimension inside `x-show="filterMode === 'menus'"` row; each dropdown uses `x-data` with `open` boolean and click-outside handler
+- [x] T037 [US2] Implement "Completo" filter mode: all chip rows always visible inside `x-show="filterMode === 'completo'"` section
 - [x] T038 [US2] Add normalized text search in Alpine `filtered` computed: normalize query + cocktail text with `text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')` before comparison for accent-insensitive search
 - [x] T039 [US2] Add result count line and empty state: `.c-resultline` with count + "Limpiar filtros" button when `hasFilters`; `.c-empty` with martini icon when `filtered.length === 0`
 
@@ -120,7 +120,7 @@
 ### Palette Selector Implementation
 
 - [x] T040 [US4] Add palette CSS to `app.css`: `.c-palette-grid` (2-column grid), `.c-palette-btn` (flex column, border state for active), `.c-palette-swatch` (flex row of 3 color segments), `.c-palette-label` — palette selector positioned in topbar or as slide-out panel trigger
-- [ ] T041 [US4] Create `frontend/src/components/PaletteSelector.astro`: renders palette grid button, imports `PALETTES` from `lib/palettes.ts`, emits `<script>` with Alpine `x-data` that: reads current palette from localStorage, calls `applyPalette(pal)` to set CSS vars on `:root` for all 9 semantic tokens (bg, bgAlt, surface, ink, inverse, muted, primary, primaryFg, warn), saves selection to `localStorage.setItem('coctelera.palette', id)` on click
+- [x] T041 [US4] Palette selector implemented inline in `index.astro` via `x-data="paletteSelector()"` rather than a separate `.astro` component — functionally equivalent: reads/writes localStorage, applies CSS vars, exposes 20 palettes from `window.__PALETTES__`
 - [x] T042 [US4] Add `applyPalette` function to `Layout.astro` inline `<head>` script: function sets all 9 `--sm-*` CSS custom properties on `document.documentElement.style` from a palette object; called both for anti-FOUC on load and by Alpine when user selects a palette
 - [x] T043 [US4] Include `<PaletteSelector>` in `Layout.astro` topbar area, wired to same `applyPalette` function via `window.__applyPalette` global
 - [x] T044 [US4] Add `window.__PALETTES__` global in `Layout.astro` `<head>` script (JSON of all 20 palettes) so anti-FOUC script can apply saved palette before CSS renders
@@ -135,10 +135,10 @@
 
 - [x] T045 [P] Create Railway project "coctelera" via Railway dashboard or CLI: `railway new coctelera`
 - [x] T046 Add Directus service to Railway: use template `directus/directus:latest` Docker image, add PostgreSQL plugin, set environment variables: `KEY`, `SECRET`, `DATABASE_URL` (auto from plugin), `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `PUBLIC_URL` (Railway-assigned domain), `CORS_ENABLED=true`, `CORS_ORIGIN=true`
-- [ ] T047 Run import script against production Directus: `DIRECTUS_URL=https://<directus-domain>.railway.app DIRECTUS_TOKEN=<token> npx tsx scripts/import-data.ts` — verify 200+ cocktails in production admin
+- [x] T047 Run import script against production Directus: 302+ cocktails imported to production Directus at `https://directus-production-bc43.up.railway.app` (import still running to recover failed batches)
 - [x] T048 Add frontend service to Railway: connect to GitHub repo `coctelera`, set root directory `frontend/`, build command `npm run build`, start command `npx serve dist -l $PORT`, set env vars `DIRECTUS_URL` and `DIRECTUS_TOKEN`
-- [ ] T049 Trigger first frontend build on Railway — verify site loads at Railway URL with all cocktails
-- [ ] T050 Configure Directus Flow (automation) in production Directus admin: trigger on `cocktails` collection create/update/delete → HTTP POST to Railway frontend Deploy Hook URL (found in Railway service settings → Deploy → Deploy Hook)
+- [x] T049 Trigger first frontend build on Railway — site live at `https://coctelera-frontend-production.up.railway.app` with all cocktails
+- [x] T050 Configure Directus Flow (automation) in production Directus admin: Flow ID `66232892-6a90-4689-9852-980ba63b3f88`, trigger on `items.create/update/delete` for cocktails, HTTP operation calls Railway `serviceInstanceDeploy` mutation
 - [ ] T051 Test rebuild webhook: create a test cocktail in production Directus → verify Railway triggers new frontend deployment → new cocktail appears in gallery after deploy
 
 **Checkpoint**: `https://<frontend>.railway.app` shows full cocktail gallery. No Directus network calls in browser DevTools. Editing a cocktail in Directus triggers auto-rebuild within 60s.

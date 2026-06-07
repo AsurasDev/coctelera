@@ -33,7 +33,7 @@ const dataJson = JSON.stringify({ cocktails: summaries, directusUrl: DIRECTUS_UR
     <div class="c-shell">
 
       <header class="c-topbar">
-        <a href="/" class="c-brand" aria-label="Coctelera — inicio">
+        <a href="/" class="c-brand">
           <span class="c-brand__mark" aria-hidden="true">🍹</span>
           <span>
             <span class="c-brand__word">Coctelera</span>
@@ -317,7 +317,6 @@ const dataJson = JSON.stringify({ cocktails: summaries, directusUrl: DIRECTUS_UR
               class="c-card"
               :href="`/cocktails/${c.slug}`"
               :data-tone="c.tone_color"
-              :aria-label="c.name"
               :style="`--c-tone: var(--sm-rec-${c.tone_color}, var(--sm-color-primary))`"
             >
               <div class="c-card__panel">
