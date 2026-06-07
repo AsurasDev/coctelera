@@ -1,0 +1,44 @@
+services:
+  directus:
+    image: directus/directus:latest
+    ports:
+      - "8055:8055"
+    environment:
+      KEY: "replace-with-random-uuid"
+      SECRET: "replace-with-random-secret"
+      ADMIN_EMAIL: "admin@coctelera.app"
+      ADMIN_PASSWORD: "Admin1234!"
+      DB_CLIENT: "pg"
+      DB_HOST: "db"
+      DB_PORT: "5432"
+      DB_DATABASE: "coctelera"
+      DB_USER: "directus"
+      DB_PASSWORD: "directus"
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: "true"
+      PUBLIC_URL: "http://localhost:8055"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - directus_uploads:/directus/uploads
+      - directus_extensions:/directus/extensions
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: coctelera
+      POSTGRES_USER: directus
+      POSTGRES_PASSWORD: directus
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U directus -d coctelera"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pg_data:
+  directus_uploads:
+  directus_extensions:

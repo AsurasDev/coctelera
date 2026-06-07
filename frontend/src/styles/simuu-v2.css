@@ -1,0 +1,263 @@
+/* ==========================================================================
+   SIMUU DESIGN SYSTEM v2 — BRUTALIST
+   Thick borders · Hard offset shadows · Square corners · Archivo Black
+   ========================================================================== */
+
+:root {
+  /* --- Primitives --- */
+  --sm-ink:        hsl(0 0% 6%);
+  --sm-paper:      hsl(48 33% 96%);
+  --sm-paper-pure: hsl(0 0% 100%);
+  --sm-ash:        hsl(0 0% 92%);
+  --sm-smoke:      hsl(0 0% 70%);
+
+  /* --- Semantic colors --- */
+  --sm-color-bg:              var(--sm-paper);
+  --sm-color-bg-alt:          var(--sm-ash);
+  --sm-color-surface:         var(--sm-paper-pure);
+  --sm-color-surface-inverse: var(--sm-ink);
+  --sm-color-fg:              var(--sm-ink);
+  --sm-color-fg-muted:        hsl(0 0% 35%);
+  --sm-color-fg-subtle:       var(--sm-smoke);
+  --sm-color-fg-inverse:      var(--sm-paper-pure);
+  --sm-color-border:          var(--sm-ink);
+  --sm-color-border-soft:     hsl(0 0% 80%);
+
+  /* --- Brand --- */
+  --sm-color-primary:        hsl(221 83% 53%);
+  --sm-color-primary-hover:  hsl(221 83% 45%);
+  --sm-color-primary-active: hsl(221 83% 38%);
+  --sm-color-primary-soft:   hsl(221 83% 92%);
+  --sm-color-primary-fg:     var(--sm-paper-pure);
+
+  --sm-color-accent:         hsl(142 76% 36%);
+  --sm-color-accent-hover:   hsl(142 76% 30%);
+  --sm-color-accent-soft:    hsl(142 60% 90%);
+  --sm-color-accent-fg:      var(--sm-paper-pure);
+
+  --sm-color-danger:         hsl(0 84% 55%);
+  --sm-color-danger-soft:    hsl(0 84% 94%);
+  --sm-color-danger-fg:      var(--sm-paper-pure);
+
+  --sm-color-warn:           hsl(38 95% 50%);
+  --sm-color-warn-soft:      hsl(38 95% 92%);
+  --sm-color-warn-fg:        var(--sm-ink);
+
+  /* --- Recommendation palette --- */
+  --sm-rec-red:     hsl(0   84% 55%);
+  --sm-rec-orange:  hsl(24  94% 53%);
+  --sm-rec-amber:   hsl(38  95% 50%);
+  --sm-rec-green:   hsl(142 71% 42%);
+  --sm-rec-teal:    hsl(173 80% 38%);
+  --sm-rec-violet:  hsl(262 75% 58%);
+  --sm-rec-blue:    hsl(221 83% 53%);
+  --sm-rec-emerald: hsl(152 76% 38%);
+
+  /* --- Focus / overlay --- */
+  --sm-color-focus-ring:    hsl(221 83% 53%);
+  --sm-color-overlay:       hsl(0 0% 6% / 0.78);
+  --sm-color-disabled-bg:   hsl(0 0% 88%);
+  --sm-color-disabled-fg:   hsl(0 0% 55%);
+
+  /* --- Typography --- */
+  --sm-font-display: "Archivo Black", "Arial Black", "Helvetica Neue", sans-serif;
+  --sm-font-sans:    "IBM Plex Sans", -apple-system, "Segoe UI", system-ui, sans-serif;
+  --sm-font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --sm-font-numeric: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
+
+  --sm-text-2xs: 11px;
+  --sm-text-xs:  12px;
+  --sm-text-sm:  14px;
+  --sm-text-md:  16px;
+  --sm-text-lg:  18px;
+  --sm-text-xl:  22px;
+  --sm-text-2xl: 28px;
+  --sm-text-3xl: 36px;
+  --sm-text-4xl: 52px;
+  --sm-text-5xl: 72px;
+  --sm-text-6xl: 96px;
+
+  --sm-weight-regular: 400;
+  --sm-weight-medium:  500;
+  --sm-weight-semi:    600;
+  --sm-weight-bold:    700;
+  --sm-weight-black:   900;
+
+  --sm-leading-tight: 1.0;
+  --sm-leading-snug:  1.15;
+  --sm-leading-base:  1.45;
+  --sm-leading-loose: 1.6;
+
+  --sm-track-tight: -0.02em;
+  --sm-track-base:   0em;
+  --sm-track-wide:   0.02em;
+  --sm-track-caps:   0.08em;
+
+  /* --- Spacing --- */
+  --sm-space-0:  0;
+  --sm-space-1:  4px;
+  --sm-space-2:  8px;
+  --sm-space-3:  12px;
+  --sm-space-4:  16px;
+  --sm-space-5:  20px;
+  --sm-space-6:  24px;
+  --sm-space-8:  32px;
+  --sm-space-10: 40px;
+  --sm-space-12: 48px;
+  --sm-space-16: 64px;
+  --sm-space-20: 80px;
+  --sm-space-24: 96px;
+
+  --sm-inset-xs: var(--sm-space-2);
+  --sm-inset-sm: var(--sm-space-3);
+  --sm-inset-md: var(--sm-space-4);
+  --sm-inset-lg: var(--sm-space-6);
+  --sm-inset-xl: var(--sm-space-8);
+
+  --sm-stack-xs: var(--sm-space-2);
+  --sm-stack-sm: var(--sm-space-3);
+  --sm-stack-md: var(--sm-space-4);
+  --sm-stack-lg: var(--sm-space-6);
+  --sm-stack-xl: var(--sm-space-10);
+
+  --sm-gap-xs: var(--sm-space-2);
+  --sm-gap-sm: var(--sm-space-3);
+  --sm-gap-md: var(--sm-space-4);
+  --sm-gap-lg: var(--sm-space-6);
+
+  /* --- Radii (brutalist = square) --- */
+  --sm-radius-none: 0px;
+  --sm-radius-xs:   2px;
+  --sm-radius-sm:   4px;
+  --sm-radius-md:   6px;
+  --sm-radius-pill: 9999px;
+  --sm-radius:      var(--sm-radius-none);
+
+  /* --- Borders --- */
+  --sm-border-width-hair:  1px;
+  --sm-border-width-base:  2px;
+  --sm-border-width-thick: 3px;
+  --sm-border-width-mega:  4px;
+  --sm-border-base:  2px solid var(--sm-ink);
+  --sm-border-thick: 3px solid var(--sm-ink);
+  --sm-border-mega:  4px solid var(--sm-ink);
+
+  /* --- Shadows (hard offset, no blur) --- */
+  --sm-shadow-none: none;
+  --sm-shadow-xs:   2px 2px 0 0 var(--sm-ink);
+  --sm-shadow-sm:   3px 3px 0 0 var(--sm-ink);
+  --sm-shadow-md:   5px 5px 0 0 var(--sm-ink);
+  --sm-shadow-lg:   8px 8px 0 0 var(--sm-ink);
+  --sm-shadow-xl:   12px 12px 0 0 var(--sm-ink);
+  --sm-shadow-primary: 5px 5px 0 0 var(--sm-color-primary);
+  --sm-shadow-inset:   inset 2px 2px 0 0 var(--sm-ink);
+
+  /* --- Motion --- */
+  --sm-duration-instant: 80ms;
+  --sm-duration-fast:    140ms;
+  --sm-duration-base:    220ms;
+  --sm-duration-slow:    320ms;
+  --sm-ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --sm-ease-in:     cubic-bezier(0.7, 0, 0.84, 0);
+  --sm-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --sm-ease-snap:   cubic-bezier(0.5, 0, 0.1, 1);
+  --sm-transition-base:      all var(--sm-duration-fast) var(--sm-ease-snap);
+  --sm-transition-color:     color var(--sm-duration-fast) var(--sm-ease-snap),
+                             background-color var(--sm-duration-fast) var(--sm-ease-snap),
+                             border-color var(--sm-duration-fast) var(--sm-ease-snap);
+  --sm-transition-transform: transform var(--sm-duration-fast) var(--sm-ease-snap),
+                             box-shadow var(--sm-duration-fast) var(--sm-ease-snap);
+
+  /* --- Z-index --- */
+  --sm-z-base:     0;
+  --sm-z-raised:   10;
+  --sm-z-sticky:   100;
+  --sm-z-dropdown: 200;
+  --sm-z-overlay:  900;
+  --sm-z-modal:    1000;
+  --sm-z-toast:    1200;
+
+  /* --- Layout --- */
+  --sm-container-sm:  640px;
+  --sm-container-md:  768px;
+  --sm-container-lg:  1024px;
+  --sm-container-xl:  1280px;
+  --sm-container-max: 1400px;
+
+  /* --- Icons --- */
+  --sm-icon-xs:  12px;
+  --sm-icon-sm:  16px;
+  --sm-icon-md:  20px;
+  --sm-icon-lg:  24px;
+  --sm-icon-xl:  32px;
+  --sm-icon-2xl: 48px;
+  --sm-icon-stroke: 2px;
+}
+
+/* =======================================================
+   BASE ELEMENTS
+   ======================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+html {
+  font-family: var(--sm-font-sans);
+  color: var(--sm-color-fg);
+  background: var(--sm-color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  font-size: var(--sm-text-md);
+  line-height: var(--sm-leading-base);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--sm-font-display);
+  font-weight: var(--sm-weight-black);
+  letter-spacing: var(--sm-track-tight);
+  line-height: var(--sm-leading-tight);
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--sm-color-fg);
+}
+h1 { font-size: var(--sm-text-4xl); }
+h2 { font-size: var(--sm-text-3xl); }
+h3 { font-size: var(--sm-text-2xl); }
+h4 { font-size: var(--sm-text-xl); letter-spacing: var(--sm-track-base); }
+
+p, li {
+  font-size: var(--sm-text-md);
+  color: var(--sm-color-fg);
+  line-height: var(--sm-leading-base);
+  margin: 0;
+}
+small, .sm-caption {
+  font-size: var(--sm-text-xs);
+  color: var(--sm-color-fg-muted);
+  letter-spacing: var(--sm-track-caps);
+  text-transform: uppercase;
+  font-weight: var(--sm-weight-semi);
+}
+label {
+  font-size: var(--sm-text-sm);
+  font-weight: var(--sm-weight-bold);
+  color: var(--sm-color-fg);
+  text-transform: uppercase;
+  letter-spacing: var(--sm-track-caps);
+}
+code, pre, .sm-mono {
+  font-family: var(--sm-font-mono);
+  font-size: 0.9em;
+}
+.sm-num {
+  font-family: var(--sm-font-numeric);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--sm-weight-bold);
+  letter-spacing: var(--sm-track-tight);
+}
+::selection {
+  background: var(--sm-color-primary);
+  color: var(--sm-color-primary-fg);
+}
+button { cursor: pointer; font-family: inherit; }
+a { color: inherit; }

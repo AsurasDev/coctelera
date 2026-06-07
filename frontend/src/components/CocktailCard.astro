@@ -1,0 +1,91 @@
+---
+interface Props {
+  slug: string;
+  name: string;
+  base_spirit: string;
+  category: string;
+  glass_type: string;
+  glass_label: string;
+  temperature: string;
+  abv: number;
+  difficulty: string;
+  tone_color: string;
+  image_id?: string;
+  garnish?: string;
+}
+
+const {
+  slug, name, base_spirit, category, glass_type, glass_label,
+  temperature, abv, difficulty, tone_color, image_id, garnish,
+} = Astro.props;
+
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL;
+const imgSrc = image_id ? `${DIRECTUS_URL}/assets/${image_id}?width=640&height=512&fit=cover&format=webp&quality=82` : null;
+
+const GLASS_LABELS: Record<string, string> = {
+  rocks: 'Rocks', highball: 'Highball', coupe: 'Coupe',
+  martini: 'Martini', hurricane: 'Hurricane', wine: 'Wine', shot: 'Shot',
+};
+const glassLabel = GLASS_LABELS[glass_type] ?? glass_type;
+---
+
+<a class="c-card" href={`/cocktails/${slug}`} data-tone={tone_color}>
+  <div class="c-card__panel">
+    {imgSrc
+      ? <img src={imgSrc} alt={name} loading="lazy" decoding="async" />
+      : <div class="c-card__noimg" aria-hidden="true">
+          <span class="c-card__glasstype">{glassLabel}</span>
+        </div>
+    }
+    <span class="c-card__abv" aria-label={`ABV: ${abv}%`}>
+      <b>{abv}</b><span>% ABV</span>
+    </span>
+    <span class="c-card__cat">{category}</span>
+  </div>
+  <div class="c-card__body">
+    <div class="c-card__name">{name}</div>
+    <div class="c-card__base">
+      <i aria-hidden="true"></i>
+      <span>{base_spirit}</span>
+    </div>
+    <div class="c-card__meta">
+      <span class="c-metachip">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M8 2C8 2 3 7 3 10.5a5 5 0 0 0 10 0C13 7 8 2 8 2z"/>
+        </svg>
+        {temperature}
+      </span>
+      <span class="c-metachip">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <rect x="3" y="3" width="10" height="10" rx="1"/>
+          <path d="M3 7h10M7 3v10"/>
+        </svg>
+        {glass_label || glassLabel}
+      </span>
+      <span class="c-metachip">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="8" cy="8" r="5"/>
+          <path d="M8 5v3l2 2"/>
+        </svg>
+        {difficulty}
+      </span>
+    </div>
+  </div>
+</a>
+
+<style>
+  .c-card__noimg {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--c-tone, var(--sm-color-primary));
+  }
+  .c-card__glasstype {
+    font-family: var(--sm-font-display);
+    font-size: var(--sm-text-3xl);
+    letter-spacing: var(--sm-track-tight);
+    text-transform: uppercase;
+    color: rgba(0,0,0,.28);
+    font-weight: 900;
+    user-select: none;
+  }
+</style>

@@ -1,0 +1,9 @@
+[build]
+buildCommand = "cd frontend && npm ci && npm run build"
+
+[deploy]
+startCommand = "npx serve frontend/dist -l $PORT --no-clipboard"
+healthcheckPath = "/"
+healthcheckTimeout = 120
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

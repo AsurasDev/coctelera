@@ -1,0 +1,291 @@
+---
+import Layout from '../../components/Layout.astro';
+import GlassIllustration from '../../components/GlassIllustration.astro';
+import { fetchAllCocktails } from '../../lib/directus';
+import type { Cocktail } from '../../lib/directus';
+
+export async function getStaticPaths() {
+  const cocktails = await fetchAllCocktails();
+  return cocktails.map((c, idx) => ({
+    params: { slug: c.slug },
+    props: {
+      cocktail: c,
+      prevSlug: idx > 0 ? cocktails[idx - 1].slug : null,
+      prevName: idx > 0 ? cocktails[idx - 1].name : null,
+      nextSlug: idx < cocktails.length - 1 ? cocktails[idx + 1].slug : null,
+      nextName: idx < cocktails.length - 1 ? cocktails[idx + 1].name : null,
+      total:    cocktails.length,
+      position: idx + 1,
+    },
+  }));
+}
+
+interface Props {
+  cocktail: Cocktail;
+  prevSlug: string | null;
+  prevName: string | null;
+  nextSlug: string | null;
+  nextName: string | null;
+  total:    number;
+  position: number;
+}
+
+const { cocktail: c, prevSlug, prevName, nextSlug, nextName, total, position } = Astro.props;
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL ?? '';
+const imageId = (c as any).image;
+const imgSrc  = imageId ? `${DIRECTUS_URL}/assets/${imageId}?width=900&height=1125&fit=cover&format=webp&quality=85` : null;
+
+const TONE_COLORS: Record<string, string> = {
+  blue: '#2563eb', teal: '#0d9488', green: '#16a34a', violet: '#7c3aed',
+  orange: '#ea580c', red: '#dc2626', emerald: '#059669', amber: '#d97706',
+};
+const toneHex = TONE_COLORS[c.tone_color] ?? '#2563eb';
+
+function formatAmt(a: string) { return a; }
+---
+
+<Layout
+  title={`${c.name} — Coctelera`}
+  description={c.description || `Receta de ${c.name}: ${c.base_spirit}, ${c.glass_label}.`}
+>
+  <div class="c-shell">
+    <nav class="c-detail__topnav" aria-label="Navegación de la página">
+      <a href="/" class="c-back">
+        <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path d="M12 5l-5 5 5 5"/>
+        </svg>
+        Todos los cócteles
+      </a>
+      <span class="c-detail__pos" aria-label={`${position} de ${total}`}>
+        {position} / {total}
+      </span>
+    </nav>
+
+    <article class="c-detail" data-tone={c.tone_color}>
+      <div class="c-detail__grid">
+
+        <!-- Visual column -->
+        <div>
+          <div class="c-visual">
+            {imgSrc
+              ? <img src={imgSrc} alt={`${c.name} cocktail`} />
+              : <GlassIllustration glassType={c.glass_type} liquidColor={toneHex} />
+            }
+            <span class="c-visual__tag">{c.glass_label ?? c.glass_type}</span>
+          </div>
+        </div>
+
+        <!-- Info column -->
+        <div class="c-info">
+          <div class="c-info__head">
+            <span class="c-info__eyebrow">
+              <i aria-hidden="true"></i>
+              {c.base_spirit} · {c.category}
+            </span>
+            <h1>{c.name}</h1>
+            {c.description && <p class="c-info__desc">{c.description}</p>}
+          </div>
+
+          <!-- Meta strip -->
+          <div class="c-metastrip" role="list" aria-label="Información del cóctel">
+            <div class="c-metastrip__cell" role="listitem">
+              <span class="c-metastrip__label">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" aria-hidden="true">
+                  <path d="M8 2C8 2 3 7 3 10.5a5 5 0 0 0 10 0C13 7 8 2 8 2z"/>
+                </svg>
+                ABV
+              </span>
+              <span class="c-metastrip__value">{c.abv}%</span>
+            </div>
+            <div class="c-metastrip__cell" role="listitem">
+              <span class="c-metastrip__label">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" aria-hidden="true">
+                  <circle cx="8" cy="8" r="5"/><path d="M8 5v3l2 2"/>
+                </svg>
+                Tiempo
+              </span>
+              <span class="c-metastrip__value">{c.preparation_time} min</span>
+            </div>
+            <div class="c-metastrip__cell" role="listitem">
+              <span class="c-metastrip__label">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" aria-hidden="true">
+                  <path d="M8 3v4l3 3"/><circle cx="8" cy="8" r="6"/>
+                </svg>
+                Dificultad
+              </span>
+              <span class="c-metastrip__value">{c.difficulty}</span>
+            </div>
+            <div class="c-metastrip__cell" role="listitem">
+              <span class="c-metastrip__label">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" aria-hidden="true">
+                  <path d="M4 8c0-2 1-3 4-3s4 1 4 3-1 3-4 3-4-1-4-3z"/>
+                </svg>
+                Temperatura
+              </span>
+              <span class="c-metastrip__value">{c.temperature}</span>
+            </div>
+            <div class="c-metastrip__cell" role="listitem">
+              <span class="c-metastrip__label">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" aria-hidden="true">
+                  <rect x="3" y="3" width="10" height="10" rx="1"/>
+                </svg>
+                Vaso
+              </span>
+              <span class="c-metastrip__value">{c.glass_label ?? c.glass_type}</span>
+            </div>
+            {c.garnish && (
+              <div class="c-metastrip__cell" role="listitem">
+                <span class="c-metastrip__label">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" aria-hidden="true">
+                    <path d="M8 2c1 2 3 4 3 6a3 3 0 0 1-6 0c0-2 2-4 3-6z"/>
+                  </svg>
+                  Garnish
+                </span>
+                <span class="c-metastrip__value">{c.garnish}</span>
+              </div>
+            )}
+          </div>
+
+          <!-- Ingredients -->
+          {c.ingredients.length > 0 && (
+            <div class="c-block">
+              <div class="c-block__head">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" aria-hidden="true">
+                  <path d="M4 4h12v4c0 4.4-2.7 8-6 8S4 12.4 4 8V4z"/><path d="M4 8h12"/>
+                </svg>
+                <span class="c-block__title">Ingredientes</span>
+                <span class="c-block__count">{c.ingredients.length}</span>
+              </div>
+              <div class="c-block__body">
+                <ul class="c-ingredients" aria-label="Lista de ingredientes">
+                  {c.ingredients.map(ing => (
+                    <li class="c-ing">
+                      <span class="c-ing__amt">{ing.amount}</span>
+                      <span class="c-ing__name">
+                        {ing.name}
+                        {ing.optional && <span class="c-ing__opt"> (opcional)</span>}
+                        {ing.note && <span class="c-ing__note"> — {ing.note}</span>}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
+
+          <!-- Steps -->
+          {c.steps.length > 0 && (
+            <div class="c-block">
+              <div class="c-block__head">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" aria-hidden="true">
+                  <path d="M5 4h10M5 8h10M5 12h6"/>
+                </svg>
+                <span class="c-block__title">Preparación</span>
+                <span class="c-block__count">{c.steps.length} pasos</span>
+              </div>
+              <div class="c-block__body">
+                <ol class="c-steps" aria-label="Pasos de preparación">
+                  {c.steps.map(step => (
+                    <li class="c-step">
+                      <span class="c-step__num" aria-hidden="true">{step.step_number}</span>
+                      <p class="c-step__text">{step.instruction}</p>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+          )}
+
+          <!-- Tags -->
+          {c.tags && c.tags.length > 0 && (
+            <div class="c-chips" aria-label="Etiquetas">
+              {c.tags.map(tag => (
+                <span class="c-chip" style="pointer-events:none">{tag}</span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <!-- Prev/Next navigation -->
+      <nav class="c-detailnav" aria-label="Navegar entre cócteles">
+        {prevSlug
+          ? (
+            <a href={`/cocktails/${prevSlug}`} class="c-detailnav__link" id="nav-prev">
+              <span class="c-detailnav__glyph" aria-hidden="true">←</span>
+              <span>
+                <span class="c-detailnav__dir">Anterior</span>
+                <span class="c-detailnav__name">{prevName}</span>
+              </span>
+            </a>
+          ) : (
+            <span class="c-detailnav__link is-disabled" aria-hidden="true">
+              <span class="c-detailnav__glyph">←</span>
+              <span><span class="c-detailnav__dir">Anterior</span></span>
+            </span>
+          )
+        }
+        {nextSlug
+          ? (
+            <a href={`/cocktails/${nextSlug}`} class="c-detailnav__link is-next" id="nav-next">
+              <span>
+                <span class="c-detailnav__dir">Siguiente</span>
+                <span class="c-detailnav__name">{nextName}</span>
+              </span>
+              <span class="c-detailnav__glyph" aria-hidden="true">→</span>
+            </a>
+          ) : (
+            <span class="c-detailnav__link is-next is-disabled" aria-hidden="true">
+              <span><span class="c-detailnav__dir">Siguiente</span></span>
+              <span class="c-detailnav__glyph">→</span>
+            </span>
+          )
+        }
+      </nav>
+    </article>
+
+    <footer class="c-foot">
+      <span>Coctelera &copy; {new Date().getFullYear()}</span>
+      {c.source && <span>Fuente: <a href={c.source} target="_blank" rel="noopener">{c.source}</a></span>}
+    </footer>
+  </div>
+
+  <!-- Keyboard navigation -->
+  <script>
+    document.addEventListener('keydown', (e) => {
+      if (e.target instanceof HTMLInputElement) return;
+      if (e.key === 'ArrowLeft')  document.getElementById('nav-prev')?.click();
+      if (e.key === 'ArrowRight') document.getElementById('nav-next')?.click();
+    });
+  </script>
+</Layout>
+
+<style>
+  .c-detail__topnav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: var(--sm-space-8);
+  }
+  .c-detail__pos {
+    font-family: var(--sm-font-mono); font-size: 11px; font-weight: 700;
+    letter-spacing: var(--sm-track-caps); text-transform: uppercase;
+    color: var(--sm-color-fg-muted);
+  }
+  .c-detailnav__link {
+    flex: 1; display: flex; align-items: center; gap: var(--sm-space-3);
+    padding: var(--sm-space-4) var(--sm-space-5);
+    background: var(--sm-color-surface); border: var(--sm-border-base); box-shadow: var(--sm-shadow-sm);
+    transition: transform var(--sm-duration-fast) var(--sm-ease-snap),
+                box-shadow var(--sm-duration-fast) var(--sm-ease-snap);
+    text-decoration: none; color: inherit;
+  }
+  .c-detailnav__link:hover:not(.is-disabled) {
+    transform: translate(-2px,-2px); box-shadow: var(--sm-shadow-md);
+    background: var(--sm-color-warn);
+  }
+  .c-detailnav__link.is-disabled { opacity: .35; pointer-events: none; }
+  .c-detailnav__link > span:first-child:not(.c-detailnav__glyph),
+  .c-detailnav__link.is-next > span:first-child { display: flex; flex-direction: column; gap: 3px; }
+  .c-ing__opt, .c-ing__note {
+    font-size: var(--sm-text-xs); color: var(--sm-color-fg-muted); font-style: italic;
+  }
+</style>

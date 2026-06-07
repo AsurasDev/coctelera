@@ -1,0 +1,459 @@
+---
+import Layout from '../components/Layout.astro';
+import CocktailCard from '../components/CocktailCard.astro';
+import { fetchAllCocktails } from '../lib/directus';
+
+const cocktails = await fetchAllCocktails();
+
+const summaries = cocktails.map(c => ({
+  slug:        c.slug,
+  name:        c.name,
+  base_spirit: c.base_spirit,
+  category:    c.category,
+  glass_type:  c.glass_type,
+  glass_label: c.glass_label ?? c.glass_type,
+  temperature: c.temperature,
+  abv:         c.abv,
+  difficulty:  c.difficulty,
+  tone_color:  c.tone_color,
+  image_id:    (c as any).image ?? undefined,
+}));
+
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL ?? '';
+const dataJson = JSON.stringify({ cocktails: summaries, directusUrl: DIRECTUS_URL });
+---
+
+<Layout
+  title="Coctelera — Base de datos de cócteles"
+  description={`${cocktails.length} cócteles clásicos y modernos en un directorio brutalist.`}
+>
+  <script type="application/json" id="cocktails-data" set:html={dataJson}></script>
+
+  <div x-data="gallery()" x-cloak id="app">
+    <div class="c-shell">
+
+      <header class="c-topbar">
+        <a href="/" class="c-brand" aria-label="Coctelera — inicio">
+          <span class="c-brand__mark" aria-hidden="true">🍹</span>
+          <span>
+            <span class="c-brand__word">Coctelera</span>
+            <span class="c-brand__tag">Directorio Brutalist</span>
+          </span>
+        </a>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div class="c-counter">
+            <b x-text="filtered.length"></b>
+            <span>/ <span x-text="cocktails.length"></span> cócteles</span>
+          </div>
+          <div class="c-palette-wrapper" x-data="paletteSelector()">
+            <button class="c-palette-trigger" @click="open = !open" :aria-expanded="open.toString()">
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="10" cy="10" r="7"/>
+                <circle cx="10" cy="6" r="1.5" fill="currentColor"/>
+                <circle cx="13.6" cy="12" r="1.5" fill="currentColor"/>
+                <circle cx="6.4" cy="12" r="1.5" fill="currentColor"/>
+              </svg>
+              Paleta
+            </button>
+            <div class="c-palette-panel" x-show="open" @click.outside="open = false" x-cloak>
+              <div class="c-palette-title">Seleccionar paleta</div>
+              <div class="c-palette-grid">
+                <template x-for="p in palettes" :key="p.id">
+                  <button
+                    class="c-palette-btn"
+                    :class="currentId === p.id && 'is-active'"
+                    @click="apply(p.id)"
+                    :aria-label="p.label"
+                    :aria-pressed="(currentId === p.id).toString()"
+                  >
+                    <div class="c-palette-swatch">
+                      <span :style="`background:${p.swatch[0]}`"></span>
+                      <span :style="`background:${p.swatch[1]}`"></span>
+                      <span :style="`background:${p.swatch[2]}`"></span>
+                    </div>
+                    <div class="c-palette-label" x-text="p.label"></div>
+                  </button>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="c-toolbar" role="search" aria-label="Filtros y búsqueda">
+        <div class="c-toolbar__row c-toolbar__row--top">
+          <div class="c-search">
+            <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-3-3"/>
+            </svg>
+            <input
+              type="search"
+              placeholder="Buscar cóctel o licor base..."
+              x-model.debounce.200ms="search"
+              aria-label="Buscar cócteles"
+              autocomplete="off"
+            />
+            <button class="c-search__clear" x-show="search" @click="search=''" aria-label="Limpiar búsqueda">×</button>
+          </div>
+          <div class="c-toolbar__controls">
+            <div class="c-filtergroup">
+              <div class="c-filtergroup__label">Orden</div>
+              <div class="c-seg" role="group" aria-label="Ordenar por">
+                <button :class="sort === 'az' ? 'is-active' : ''" @click="sort = 'az'">A–Z</button>
+                <button :class="sort === 'za' ? 'is-active' : ''" @click="sort = 'za'">Z–A</button>
+                <button :class="sort === 'abv-hi' ? 'is-active' : ''" @click="sort = 'abv-hi'">ABV ↑</button>
+                <button :class="sort === 'abv-lo' ? 'is-active' : ''" @click="sort = 'abv-lo'">ABV ↓</button>
+              </div>
+            </div>
+            <button class="c-filtersbtn" :class="filtersOpen ? 'is-open' : ''" @click="filtersOpen = !filtersOpen" :aria-expanded="filtersOpen.toString()">
+              <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <path d="M3 5h14M6 10h8M9 15h2"/>
+              </svg>
+              Filtros
+              <span class="c-filtersbtn__badge" x-show="activeCount > 0" x-text="activeCount"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="c-filterpanel" x-show="filtersOpen">
+          <div class="c-filtergroup">
+            <div class="c-filtergroup__label">Licor base</div>
+            <div class="c-chips" role="group" aria-label="Filtrar por licor base">
+              <template x-for="s in uniqueSpirits" :key="s">
+                <button
+                  class="c-chip"
+                  :class="spirits.includes(s) ? 'is-active' : ''"
+                  :aria-pressed="spirits.includes(s).toString()"
+                  @click="toggleFilter('spirits', s)"
+                  x-text="s"
+                ></button>
+              </template>
+            </div>
+          </div>
+
+          <div class="c-filtergroup">
+            <div class="c-filtergroup__label">Tipo de vaso</div>
+            <div class="c-chips" role="group" aria-label="Filtrar por tipo de vaso">
+              <template x-for="g in uniqueGlasses" :key="g.value">
+                <button
+                  class="c-chip"
+                  :class="glasses.includes(g.value) ? 'is-active' : ''"
+                  :aria-pressed="glasses.includes(g.value).toString()"
+                  @click="toggleFilter('glasses', g.value)"
+                  x-text="g.label"
+                ></button>
+              </template>
+            </div>
+          </div>
+
+          <div class="c-filtergroup">
+            <div class="c-filtergroup__label">Temperatura</div>
+            <div class="c-chips" role="group" aria-label="Filtrar por temperatura">
+              <template x-for="t in uniqueTemps" :key="t">
+                <button
+                  class="c-chip"
+                  :class="temps.includes(t) ? 'is-active' : ''"
+                  :aria-pressed="temps.includes(t).toString()"
+                  @click="toggleFilter('temps', t)"
+                  x-text="t"
+                ></button>
+              </template>
+            </div>
+          </div>
+
+          <div class="c-filtergroup">
+            <div class="c-filtergroup__label">Dificultad</div>
+            <div class="c-chips" role="group" aria-label="Filtrar por dificultad">
+              <template x-for="d in uniqueDiffs" :key="d">
+                <button
+                  class="c-chip"
+                  :class="diffs.includes(d) ? 'is-active' : ''"
+                  :aria-pressed="diffs.includes(d).toString()"
+                  @click="toggleFilter('diffs', d)"
+                  x-text="d"
+                ></button>
+              </template>
+            </div>
+          </div>
+
+          <div class="c-toolbar__row" x-show="activeCount > 0">
+            <div class="c-activetags">
+              <template x-for="tag in activeTags" :key="tag.key">
+                <button class="c-tag" @click="removeTag(tag)" :aria-label="`Quitar: ${tag.label}`">
+                  <span class="c-tag__cap" x-text="tag.group"></span>
+                  <span x-text="tag.label"></span>
+                  <span class="c-tag__x" aria-hidden="true">×</span>
+                </button>
+              </template>
+              <button class="c-resultline__reset" @click="resetAll">Limpiar todo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="c-resultline" aria-live="polite">
+        <b x-text="filtered.length"></b>
+        <span x-text="filtered.length === 1 ? 'cóctel' : 'cócteles'"></span>
+      </div>
+
+      <main id="main" aria-label="Galería de cócteles">
+        <div class="c-grid">
+          <template x-if="filtered.length === 0">
+            <div class="c-empty">
+              <b>Sin resultados</b>
+              <p>Prueba con otra búsqueda o ajusta los filtros</p>
+              <button class="c-chip" @click="resetAll">Limpiar filtros</button>
+            </div>
+          </template>
+
+          <template x-for="c in filtered" :key="c.slug">
+            <a
+              class="c-card"
+              :href="`/cocktails/${c.slug}`"
+              :data-tone="c.tone_color"
+              :aria-label="c.name"
+              :style="`--c-tone: var(--sm-rec-${c.tone_color}, var(--sm-color-primary))`"
+            >
+              <div class="c-card__panel">
+                <template x-if="c.image_id">
+                  <img
+                    :src="`${directusUrl}/assets/${c.image_id}?width=640&height=512&fit=cover&format=webp&quality=82`"
+                    :alt="c.name"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </template>
+                <template x-if="!c.image_id">
+                  <div class="c-card__noimg" aria-hidden="true">
+                    <span class="c-card__glasstype" x-text="c.glass_type.toUpperCase()"></span>
+                  </div>
+                </template>
+                <span class="c-card__abv">
+                  <b x-text="c.abv"></b><span>% ABV</span>
+                </span>
+                <span class="c-card__cat" x-text="c.category"></span>
+              </div>
+              <div class="c-card__body">
+                <div class="c-card__name" x-text="c.name"></div>
+                <div class="c-card__base">
+                  <i aria-hidden="true"></i>
+                  <span x-text="c.base_spirit"></span>
+                </div>
+                <div class="c-card__meta">
+                  <span class="c-metachip">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" aria-hidden="true">
+                      <path d="M8 2C8 2 3 7 3 10.5a5 5 0 0 0 10 0C13 7 8 2 8 2z"/>
+                    </svg>
+                    <span x-text="c.temperature"></span>
+                  </span>
+                  <span class="c-metachip">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" aria-hidden="true">
+                      <rect x="3" y="3" width="10" height="10" rx="1"/>
+                    </svg>
+                    <span x-text="c.glass_label || c.glass_type"></span>
+                  </span>
+                  <span class="c-metachip">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" aria-hidden="true">
+                      <circle cx="8" cy="8" r="5"/><path d="M8 5v3l2 2"/>
+                    </svg>
+                    <span x-text="c.difficulty"></span>
+                  </span>
+                </div>
+              </div>
+            </a>
+          </template>
+        </div>
+      </main>
+
+      <footer class="c-foot">
+        <span>Coctelera &copy; {new Date().getFullYear()}</span>
+        <span>Datos: <a href="https://github.com/bar-assistant/data" target="_blank" rel="noopener">Bar Assistant</a></span>
+        <span>Hecho con Astro + Directus</span>
+      </footer>
+    </div>
+  </div>
+
+  <!-- No-JS static fallback -->
+  <noscript>
+    <div class="c-shell">
+      <header class="c-topbar">
+        <a href="/" class="c-brand">
+          <span class="c-brand__mark" aria-hidden="true">🍹</span>
+          <span>
+            <span class="c-brand__word">Coctelera</span>
+            <span class="c-brand__tag">Directorio Brutalist</span>
+          </span>
+        </a>
+        <div class="c-counter"><b>{cocktails.length}</b><span>cócteles</span></div>
+      </header>
+      <main class="c-grid">
+        {cocktails.map(c => (
+          <CocktailCard
+            slug={c.slug}
+            name={c.name}
+            base_spirit={c.base_spirit}
+            category={c.category}
+            glass_type={c.glass_type}
+            glass_label={c.glass_label}
+            temperature={c.temperature}
+            abv={c.abv}
+            difficulty={c.difficulty}
+            tone_color={c.tone_color}
+            image_id={(c as any).image}
+          />
+        ))}
+      </main>
+    </div>
+  </noscript>
+</Layout>
+
+<script>
+  document.addEventListener('alpine:init', () => {
+    const Alpine = (window as any).Alpine;
+
+    Alpine.data('gallery', () => ({
+      cocktails: [] as any[],
+      directusUrl: '',
+      search: '',
+      spirits: [] as string[],
+      glasses: [] as string[],
+      temps: [] as string[],
+      diffs: [] as string[],
+      sort: 'az',
+      filtersOpen: false,
+
+      init() {
+        const el = document.getElementById('cocktails-data');
+        if (el) {
+          const data = JSON.parse(el.textContent || '{}');
+          this.cocktails = data.cocktails ?? [];
+          this.directusUrl = data.directusUrl ?? '';
+        }
+        this.restoreState();
+        ['search','spirits','glasses','temps','diffs','sort'].forEach(k => {
+          this.$watch(k, () => this.saveState());
+        });
+      },
+
+      get uniqueSpirits(): string[] {
+        return [...new Set(this.cocktails.map((c: any) => c.base_spirit).filter(Boolean))].sort() as string[];
+      },
+
+      get uniqueGlasses(): { value: string; label: string }[] {
+        const m = new Map<string, string>();
+        this.cocktails.forEach((c: any) => {
+          if (c.glass_type && !m.has(c.glass_type)) m.set(c.glass_type, c.glass_label || c.glass_type);
+        });
+        return [...m.entries()].sort((a,b) => a[1].localeCompare(b[1])).map(([value, label]) => ({ value, label }));
+      },
+
+      get uniqueTemps(): string[] {
+        return [...new Set(this.cocktails.map((c: any) => c.temperature).filter(Boolean))].sort() as string[];
+      },
+
+      get uniqueDiffs(): string[] {
+        return [...new Set(this.cocktails.map((c: any) => c.difficulty).filter(Boolean))].sort() as string[];
+      },
+
+      get activeCount(): number {
+        return this.spirits.length + this.glasses.length + this.temps.length + this.diffs.length;
+      },
+
+      get activeTags(): any[] {
+        const tags: any[] = [];
+        (this.spirits as string[]).forEach(v => tags.push({ key: `s-${v}`, group: 'Licor', label: v, filter: 'spirits', value: v }));
+        (this.glasses as string[]).forEach(v => tags.push({ key: `g-${v}`, group: 'Vaso',  label: v, filter: 'glasses', value: v }));
+        (this.temps   as string[]).forEach(v => tags.push({ key: `t-${v}`, group: 'Temp',  label: v, filter: 'temps',   value: v }));
+        (this.diffs   as string[]).forEach(v => tags.push({ key: `d-${v}`, group: 'Dif',   label: v, filter: 'diffs',   value: v }));
+        return tags;
+      },
+
+      get filtered(): any[] {
+        let result: any[] = this.cocktails;
+        const q = (this.search as string).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+        if (q) {
+          result = result.filter((c: any) => {
+            const hay = `${c.name} ${c.base_spirit} ${c.category}`.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+            return hay.includes(q);
+          });
+        }
+        if ((this.spirits as string[]).length) result = result.filter((c: any) => (this.spirits as string[]).includes(c.base_spirit));
+        if ((this.glasses as string[]).length) result = result.filter((c: any) => (this.glasses as string[]).includes(c.glass_type));
+        if ((this.temps   as string[]).length) result = result.filter((c: any) => (this.temps   as string[]).includes(c.temperature));
+        if ((this.diffs   as string[]).length) result = result.filter((c: any) => (this.diffs   as string[]).includes(c.difficulty));
+        const sorted = [...result];
+        switch (this.sort) {
+          case 'za':     return sorted.sort((a,b) => b.name.localeCompare(a.name));
+          case 'abv-hi': return sorted.sort((a,b) => (b.abv ?? 0) - (a.abv ?? 0));
+          case 'abv-lo': return sorted.sort((a,b) => (a.abv ?? 0) - (b.abv ?? 0));
+          default:       return sorted.sort((a,b) => a.name.localeCompare(b.name));
+        }
+      },
+
+      toggleFilter(filter: 'spirits' | 'glasses' | 'temps' | 'diffs', value: string) {
+        const arr: string[] = this[filter] as string[];
+        this[filter] = arr.includes(value) ? arr.filter(v => v !== value) : [...arr, value];
+      },
+
+      removeTag(tag: { filter: 'spirits' | 'glasses' | 'temps' | 'diffs'; value: string }) {
+        this.toggleFilter(tag.filter, tag.value);
+      },
+
+      resetAll() {
+        this.search = ''; this.spirits = []; this.glasses = [];
+        this.temps = []; this.diffs = []; this.sort = 'az';
+      },
+
+      saveState() {
+        try {
+          localStorage.setItem('coctelera-filters', JSON.stringify({
+            search: this.search, spirits: this.spirits, glasses: this.glasses,
+            temps: this.temps, diffs: this.diffs, sort: this.sort,
+          }));
+        } catch {}
+      },
+
+      restoreState() {
+        try {
+          const raw = localStorage.getItem('coctelera-filters');
+          if (!raw) return;
+          const s = JSON.parse(raw);
+          Object.assign(this, {
+            search:  s.search  || '',
+            spirits: s.spirits || [],
+            glasses: s.glasses || [],
+            temps:   s.temps   || [],
+            diffs:   s.diffs   || [],
+            sort:    s.sort    || 'az',
+          });
+        } catch {}
+      },
+    }));
+
+    Alpine.data('paletteSelector', () => ({
+      open: false,
+      currentId: localStorage.getItem('coctelera-palette') || 'cobalto',
+      palettes: (window as any).__PALETTES__ || [],
+
+      init() {
+        this.palettes = (window as any).__PALETTES__ || [];
+      },
+
+      apply(id: string) {
+        this.currentId = id;
+        localStorage.setItem('coctelera-palette', id);
+        const p = this.palettes.find((x: any) => x.id === id);
+        if (p) {
+          Object.entries(p.vars).forEach(([k, v]) => {
+            document.documentElement.style.setProperty(k, v as string);
+          });
+        }
+        this.open = false;
+      },
+    }));
+  });
+</script>
+
+<style is:global>
+  [x-cloak] { display: none !important; }
+</style>

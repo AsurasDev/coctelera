@@ -1,0 +1,14 @@
+{
+  "name": "coctelera",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "setup-directus": "tsx scripts/setup-directus.ts",
+    "import-data": "tsx scripts/import-data.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}

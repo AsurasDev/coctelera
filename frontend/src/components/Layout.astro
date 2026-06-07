@@ -1,0 +1,72 @@
+---
+import { PALETTES, DEFAULT_PALETTE_ID, paletteToVars } from '../lib/palettes';
+import '../styles/simuu-v2.css';
+import '../styles/app.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const {
+  title = 'Coctelera — Brutalist Cocktail Database',
+  description = 'Más de 200 cócteles clásicos y modernos en un directorio brutalist.',
+  ogImage,
+} = Astro.props;
+
+const defaultPalette = PALETTES.find(p => p.id === DEFAULT_PALETTE_ID) ?? PALETTES[0];
+const defaultVars = paletteToVars(defaultPalette);
+const defaultCSSVars = Object.entries(defaultVars).map(([k,v]) => `${k}:${v}`).join(';');
+
+const palettesForAntifouc = PALETTES.map(p => ({ id: p.id, vars: paletteToVars(p) }));
+const palettesJSON = JSON.stringify(palettesForAntifouc);
+
+// Full palette data for Alpine (includes swatch and label)
+const palettesForAlpine = JSON.stringify(
+  PALETTES.map(p => ({ id: p.id, label: p.label, swatch: p.swatch, vars: paletteToVars(p) }))
+);
+---
+
+<!doctype html>
+<html lang="es" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content={Astro.generator} />
+
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  {ogImage && <meta property="og:image" content={ogImage} />}
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Anti-FOUC: apply saved palette before any CSS paint; expose palette data globally -->
+  <script is:inline define:vars={{ palettesJSON, palettesForAlpine, defaultCSSVars }}>
+    (function() {
+      document.documentElement.classList.remove('no-js');
+      var palettes = JSON.parse(palettesJSON);
+      var saved = localStorage.getItem('coctelera-palette') || 'cobalto';
+      var p = palettes.find(function(x) { return x.id === saved; });
+      var vars = p ? p.vars : palettes[0].vars;
+      var root = document.documentElement;
+      Object.keys(vars).forEach(function(k) { root.style.setProperty(k, vars[k]); });
+      window.__PALETTES__ = JSON.parse(palettesForAlpine);
+    })();
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap"
+  />
+
+</head>
+<body>
+  <slot />
+</body>
+</html>
