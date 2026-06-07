@@ -105,7 +105,15 @@ const dataJson = JSON.stringify({ cocktails: summaries, directusUrl: DIRECTUS_UR
                 <button :class="sort === 'abv-lo' ? 'is-active' : ''" @click="sort = 'abv-lo'">ABV ↓</button>
               </div>
             </div>
-            <button class="c-filtersbtn" :class="filtersOpen ? 'is-open' : ''" @click="filtersOpen = !filtersOpen" :aria-expanded="filtersOpen.toString()">
+            <div class="c-filtergroup">
+              <div class="c-filtergroup__label">Vista filtros</div>
+              <div class="c-seg" role="group" aria-label="Modo de filtros">
+                <button :class="filterMode === 'plegable' ? 'is-active' : ''" @click="filterMode = 'plegable'; filtersOpen = true">Plegable</button>
+                <button :class="filterMode === 'menus' ? 'is-active' : ''" @click="filterMode = 'menus'">Menús</button>
+                <button :class="filterMode === 'completo' ? 'is-active' : ''" @click="filterMode = 'completo'">Completo</button>
+              </div>
+            </div>
+            <button class="c-filtersbtn" x-show="filterMode === 'plegable'" :class="filtersOpen ? 'is-open' : ''" @click="filtersOpen = !filtersOpen" :aria-expanded="filtersOpen.toString()">
               <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
                 <path d="M3 5h14M6 10h8M9 15h2"/>
               </svg>
@@ -115,67 +123,165 @@ const dataJson = JSON.stringify({ cocktails: summaries, directusUrl: DIRECTUS_UR
           </div>
         </div>
 
-        <div class="c-filterpanel" x-show="filtersOpen">
+        <!-- Plegable mode: collapsible chip panel -->
+        <div class="c-filterpanel" x-show="filterMode === 'plegable' && filtersOpen">
           <div class="c-filtergroup">
             <div class="c-filtergroup__label">Licor base</div>
             <div class="c-chips" role="group" aria-label="Filtrar por licor base">
               <template x-for="s in uniqueSpirits" :key="s">
-                <button
-                  class="c-chip"
-                  :class="spirits.includes(s) ? 'is-active' : ''"
-                  :aria-pressed="spirits.includes(s).toString()"
-                  @click="toggleFilter('spirits', s)"
-                  x-text="s"
-                ></button>
+                <button class="c-chip" :class="spirits.includes(s) ? 'is-active' : ''" :aria-pressed="spirits.includes(s).toString()" @click="toggleFilter('spirits', s)" x-text="s"></button>
               </template>
             </div>
           </div>
-
           <div class="c-filtergroup">
             <div class="c-filtergroup__label">Tipo de vaso</div>
             <div class="c-chips" role="group" aria-label="Filtrar por tipo de vaso">
               <template x-for="g in uniqueGlasses" :key="g.value">
-                <button
-                  class="c-chip"
-                  :class="glasses.includes(g.value) ? 'is-active' : ''"
-                  :aria-pressed="glasses.includes(g.value).toString()"
-                  @click="toggleFilter('glasses', g.value)"
-                  x-text="g.label"
-                ></button>
+                <button class="c-chip" :class="glasses.includes(g.value) ? 'is-active' : ''" :aria-pressed="glasses.includes(g.value).toString()" @click="toggleFilter('glasses', g.value)" x-text="g.label"></button>
               </template>
             </div>
           </div>
-
           <div class="c-filtergroup">
             <div class="c-filtergroup__label">Temperatura</div>
             <div class="c-chips" role="group" aria-label="Filtrar por temperatura">
               <template x-for="t in uniqueTemps" :key="t">
-                <button
-                  class="c-chip"
-                  :class="temps.includes(t) ? 'is-active' : ''"
-                  :aria-pressed="temps.includes(t).toString()"
-                  @click="toggleFilter('temps', t)"
-                  x-text="t"
-                ></button>
+                <button class="c-chip" :class="temps.includes(t) ? 'is-active' : ''" :aria-pressed="temps.includes(t).toString()" @click="toggleFilter('temps', t)" x-text="t"></button>
               </template>
             </div>
           </div>
-
           <div class="c-filtergroup">
             <div class="c-filtergroup__label">Dificultad</div>
             <div class="c-chips" role="group" aria-label="Filtrar por dificultad">
               <template x-for="d in uniqueDiffs" :key="d">
-                <button
-                  class="c-chip"
-                  :class="diffs.includes(d) ? 'is-active' : ''"
-                  :aria-pressed="diffs.includes(d).toString()"
-                  @click="toggleFilter('diffs', d)"
-                  x-text="d"
-                ></button>
+                <button class="c-chip" :class="diffs.includes(d) ? 'is-active' : ''" :aria-pressed="diffs.includes(d).toString()" @click="toggleFilter('diffs', d)" x-text="d"></button>
+              </template>
+            </div>
+          </div>
+          <div class="c-toolbar__row" x-show="activeCount > 0">
+            <div class="c-activetags">
+              <template x-for="tag in activeTags" :key="tag.key">
+                <button class="c-tag" @click="removeTag(tag)" :aria-label="`Quitar: ${tag.label}`">
+                  <span class="c-tag__cap" x-text="tag.group"></span>
+                  <span x-text="tag.label"></span>
+                  <span class="c-tag__x" aria-hidden="true">×</span>
+                </button>
+              </template>
+              <button class="c-resultline__reset" @click="resetAll">Limpiar todo</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Menús mode: one dropdown per dimension -->
+        <div class="c-fdrops" style="display:flex;flex-wrap:wrap;gap:8px;padding:12px 0" x-show="filterMode === 'menus'">
+          <div class="c-fdrop" x-data="{ open: false }">
+            <button class="c-fdrop__btn" :class="spirits.length ? 'is-active' : ''" @click="open = !open" :aria-expanded="open.toString()">
+              <div class="c-fdrop__txt">
+                <span class="c-fdrop__cap">Licor base</span>
+                <span class="c-fdrop__val" x-text="spirits.length ? spirits.slice(0,2).join(', ') + (spirits.length > 2 ? ' +' + (spirits.length-2) : '') : 'Todos'"></span>
+              </div>
+              <svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 4l4 4 4-4"/></svg>
+            </button>
+            <div class="c-fdrop__menu" x-show="open" @click.outside="open = false" x-cloak>
+              <template x-for="s in uniqueSpirits" :key="s">
+                <button class="c-fdrop__opt" :class="spirits.includes(s) ? 'is-sel' : ''" @click="toggleFilter('spirits', s)">
+                  <span class="c-fdrop__optlabel" x-text="s"></span>
+                  <span x-show="spirits.includes(s)" aria-hidden="true">✓</span>
+                </button>
               </template>
             </div>
           </div>
 
+          <div class="c-fdrop" x-data="{ open: false }">
+            <button class="c-fdrop__btn" :class="glasses.length ? 'is-active' : ''" @click="open = !open" :aria-expanded="open.toString()">
+              <div class="c-fdrop__txt">
+                <span class="c-fdrop__cap">Tipo de vaso</span>
+                <span class="c-fdrop__val" x-text="glasses.length ? glasses.slice(0,2).join(', ') + (glasses.length > 2 ? ' +' + (glasses.length-2) : '') : 'Todos'"></span>
+              </div>
+              <svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 4l4 4 4-4"/></svg>
+            </button>
+            <div class="c-fdrop__menu" x-show="open" @click.outside="open = false" x-cloak>
+              <template x-for="g in uniqueGlasses" :key="g.value">
+                <button class="c-fdrop__opt" :class="glasses.includes(g.value) ? 'is-sel' : ''" @click="toggleFilter('glasses', g.value)">
+                  <span class="c-fdrop__optlabel" x-text="g.label"></span>
+                  <span x-show="glasses.includes(g.value)" aria-hidden="true">✓</span>
+                </button>
+              </template>
+            </div>
+          </div>
+
+          <div class="c-fdrop" x-data="{ open: false }">
+            <button class="c-fdrop__btn" :class="temps.length ? 'is-active' : ''" @click="open = !open" :aria-expanded="open.toString()">
+              <div class="c-fdrop__txt">
+                <span class="c-fdrop__cap">Temperatura</span>
+                <span class="c-fdrop__val" x-text="temps.length ? temps.join(', ') : 'Todas'"></span>
+              </div>
+              <svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 4l4 4 4-4"/></svg>
+            </button>
+            <div class="c-fdrop__menu" x-show="open" @click.outside="open = false" x-cloak>
+              <template x-for="t in uniqueTemps" :key="t">
+                <button class="c-fdrop__opt" :class="temps.includes(t) ? 'is-sel' : ''" @click="toggleFilter('temps', t)">
+                  <span class="c-fdrop__optlabel" x-text="t"></span>
+                  <span x-show="temps.includes(t)" aria-hidden="true">✓</span>
+                </button>
+              </template>
+            </div>
+          </div>
+
+          <div class="c-fdrop" x-data="{ open: false }">
+            <button class="c-fdrop__btn" :class="diffs.length ? 'is-active' : ''" @click="open = !open" :aria-expanded="open.toString()">
+              <div class="c-fdrop__txt">
+                <span class="c-fdrop__cap">Dificultad</span>
+                <span class="c-fdrop__val" x-text="diffs.length ? diffs.join(', ') : 'Todas'"></span>
+              </div>
+              <svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 4l4 4 4-4"/></svg>
+            </button>
+            <div class="c-fdrop__menu" x-show="open" @click.outside="open = false" x-cloak>
+              <template x-for="d in uniqueDiffs" :key="d">
+                <button class="c-fdrop__opt" :class="diffs.includes(d) ? 'is-sel' : ''" @click="toggleFilter('diffs', d)">
+                  <span class="c-fdrop__optlabel" x-text="d"></span>
+                  <span x-show="diffs.includes(d)" aria-hidden="true">✓</span>
+                </button>
+              </template>
+            </div>
+          </div>
+
+          <button class="c-fdrops__clear" x-show="activeCount > 0" @click="resetAll">Limpiar</button>
+        </div>
+
+        <!-- Completo mode: all chip rows always visible -->
+        <div class="c-filterpanel" x-show="filterMode === 'completo'">
+          <div class="c-filtergroup">
+            <div class="c-filtergroup__label">Licor base</div>
+            <div class="c-chips" role="group" aria-label="Filtrar por licor base">
+              <template x-for="s in uniqueSpirits" :key="s">
+                <button class="c-chip" :class="spirits.includes(s) ? 'is-active' : ''" :aria-pressed="spirits.includes(s).toString()" @click="toggleFilter('spirits', s)" x-text="s"></button>
+              </template>
+            </div>
+          </div>
+          <div class="c-filtergroup">
+            <div class="c-filtergroup__label">Tipo de vaso</div>
+            <div class="c-chips" role="group" aria-label="Filtrar por tipo de vaso">
+              <template x-for="g in uniqueGlasses" :key="g.value">
+                <button class="c-chip" :class="glasses.includes(g.value) ? 'is-active' : ''" :aria-pressed="glasses.includes(g.value).toString()" @click="toggleFilter('glasses', g.value)" x-text="g.label"></button>
+              </template>
+            </div>
+          </div>
+          <div class="c-filtergroup">
+            <div class="c-filtergroup__label">Temperatura</div>
+            <div class="c-chips" role="group" aria-label="Filtrar por temperatura">
+              <template x-for="t in uniqueTemps" :key="t">
+                <button class="c-chip" :class="temps.includes(t) ? 'is-active' : ''" :aria-pressed="temps.includes(t).toString()" @click="toggleFilter('temps', t)" x-text="t"></button>
+              </template>
+            </div>
+          </div>
+          <div class="c-filtergroup">
+            <div class="c-filtergroup__label">Dificultad</div>
+            <div class="c-chips" role="group" aria-label="Filtrar por dificultad">
+              <template x-for="d in uniqueDiffs" :key="d">
+                <button class="c-chip" :class="diffs.includes(d) ? 'is-active' : ''" :aria-pressed="diffs.includes(d).toString()" @click="toggleFilter('diffs', d)" x-text="d"></button>
+              </template>
+            </div>
+          </div>
           <div class="c-toolbar__row" x-show="activeCount > 0">
             <div class="c-activetags">
               <template x-for="tag in activeTags" :key="tag.key">
@@ -320,6 +426,7 @@ const dataJson = JSON.stringify({ cocktails: summaries, directusUrl: DIRECTUS_UR
       temps: [] as string[],
       diffs: [] as string[],
       sort: 'az',
+      filterMode: 'plegable' as 'plegable' | 'menus' | 'completo',
       filtersOpen: false,
 
       init() {
@@ -330,7 +437,7 @@ const dataJson = JSON.stringify({ cocktails: summaries, directusUrl: DIRECTUS_UR
           this.directusUrl = data.directusUrl ?? '';
         }
         this.restoreState();
-        ['search','spirits','glasses','temps','diffs','sort'].forEach(k => {
+        ['search','spirits','glasses','temps','diffs','sort','filterMode','filtersOpen'].forEach(k => {
           this.$watch(k, () => this.saveState());
         });
       },
@@ -409,6 +516,7 @@ const dataJson = JSON.stringify({ cocktails: summaries, directusUrl: DIRECTUS_UR
           localStorage.setItem('coctelera-filters', JSON.stringify({
             search: this.search, spirits: this.spirits, glasses: this.glasses,
             temps: this.temps, diffs: this.diffs, sort: this.sort,
+            filterMode: this.filterMode, filtersOpen: this.filtersOpen,
           }));
         } catch {}
       },
@@ -419,12 +527,14 @@ const dataJson = JSON.stringify({ cocktails: summaries, directusUrl: DIRECTUS_UR
           if (!raw) return;
           const s = JSON.parse(raw);
           Object.assign(this, {
-            search:  s.search  || '',
-            spirits: s.spirits || [],
-            glasses: s.glasses || [],
-            temps:   s.temps   || [],
-            diffs:   s.diffs   || [],
-            sort:    s.sort    || 'az',
+            search:      s.search      || '',
+            spirits:     s.spirits     || [],
+            glasses:     s.glasses     || [],
+            temps:       s.temps       || [],
+            diffs:       s.diffs       || [],
+            sort:        s.sort        || 'az',
+            filterMode:  s.filterMode  || 'plegable',
+            filtersOpen: s.filtersOpen ?? false,
           });
         } catch {}
       },
